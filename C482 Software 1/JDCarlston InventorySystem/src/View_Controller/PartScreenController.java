@@ -188,7 +188,7 @@ public class PartScreenController extends BaseController {
         
         if (radioPartInhouse.isSelected()) {
             InhousePart newPart = new InhousePart();
-            newPart.setID(getNewPartID());
+            newPart.setPartID(getNewPartID());
             newPart.setName(name);
             newPart.setInStock(tryParseInt(inventory));
             newPart.setPrice(tryParseDouble(price));
@@ -209,7 +209,7 @@ public class PartScreenController extends BaseController {
         } else {
             OutsourcedPart newPart = new OutsourcedPart();
 
-            newPart.setID(activePart.getID());
+            newPart.setPartID(activePart.getPartID());
             newPart.setName(name);
             newPart.setInStock(Integer.parseInt(inventory));
             newPart.setPrice(Double.parseDouble(price));
@@ -240,7 +240,7 @@ public class PartScreenController extends BaseController {
                 && inhouse) {
             InhousePart newPart = new InhousePart();
 
-            newPart.setID(id);
+            newPart.setPartID(id);
             newPart.setName(name);
             newPart.setInStock(tryParseInt(inventory));
             newPart.setPrice(tryParseDouble(price));
@@ -259,7 +259,7 @@ public class PartScreenController extends BaseController {
         } else if (activePart instanceof OutsourcedPart) {
             OutsourcedPart newPart = new OutsourcedPart();
 
-            newPart.setID(activePart.getID());
+            newPart.setPartID(activePart.getPartID());
             newPart.setName(name);
             newPart.setInStock(tryParseInt(inventory));
             newPart.setPrice(tryParseDouble(price));

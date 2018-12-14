@@ -49,7 +49,7 @@ public abstract class Item {
      *
      * @param newID
      */
-    public void setID(Integer newID) {
+    protected void setID(Integer newID) {
         _ID = newID;
     }
 
@@ -57,7 +57,7 @@ public abstract class Item {
      *
      * @return
      */
-    public int getID() {
+    protected int getID() {
         return _ID;
     }
 

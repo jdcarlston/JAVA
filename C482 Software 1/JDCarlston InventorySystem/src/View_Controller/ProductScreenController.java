@@ -209,7 +209,7 @@ public class ProductScreenController extends BaseController {
 
         } //Add New
         else {
-            activeProduct.setID(Inventory.getNewProductID());
+            activeProduct.setProductID(Inventory.getNewProductID());
             clickAddProduct(event);
         }
     }
@@ -310,7 +310,7 @@ public class ProductScreenController extends BaseController {
 
         Product newProduct = new Product();
 
-        newProduct.setID(Integer.parseInt(id));
+        newProduct.setProductID(Integer.parseInt(id));
         newProduct.setName(name);
         newProduct.setInStock(Integer.parseInt(inventory));
         newProduct.setPrice(Double.parseDouble(price));
