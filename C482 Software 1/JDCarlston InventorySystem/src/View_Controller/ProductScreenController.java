@@ -7,8 +7,6 @@ package View_Controller;
 
 import Model.*;
 import static Model.Inventory.*;
-import static View_Controller.BaseController.alertInvalid;
-import static View_Controller.MainScreenController.alertDelete;
 
 import java.io.IOException;
 import java.net.URL;
@@ -25,8 +23,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
-import static View_Controller.MainScreenController.getActiveProduct;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -162,6 +158,7 @@ public class ProductScreenController extends BaseController {
             alertInvalid("Associated Part", e.getMessage());
         }
         loadTableViewAddedParts(activeProduct.getAssociatedParts());
+
     }
 
     @FXML
@@ -205,7 +202,7 @@ public class ProductScreenController extends BaseController {
     @FXML
     void clickSave(ActionEvent event) throws IOException {
         if (activeProduct != null) {
-            clickUpdateProduct(event);
+            clickModifyProduct(event);
 
         } //Add New
         else {
@@ -232,7 +229,7 @@ public class ProductScreenController extends BaseController {
      *
      */
     public ProductScreenController() {
-        activeProduct = getActiveProduct();
+        activeProduct = MainScreenController.getActiveProduct();
     }
 
     /**
@@ -287,7 +284,7 @@ public class ProductScreenController extends BaseController {
         }
     }
 
-    private void clickUpdateProduct(ActionEvent event) throws IOException {
+    private void clickModifyProduct(ActionEvent event) throws IOException {
         Product productToUpdate = getProductByTextFields();
 
         try {
@@ -321,14 +318,14 @@ public class ProductScreenController extends BaseController {
     }
 
     private void bindTableColumnsAllParts() {
-        tableColumnAllPartID.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getID()).asObject());
+        tableColumnAllPartID.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getPartID()).asObject());
         tableColumnAllPartName.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
         tableColumnAllPartInventoryLevel.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getInStock()).asObject());
         tableColumnAllPartPrice.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getPrice()).asObject());
     }
 
     private void bindTableColumnsAddedParts() {
-        tableColumnAddedPartID.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getID()).asObject());
+        tableColumnAddedPartID.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getPartID()).asObject());
         tableColumnAddedPartName.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
         tableColumnAddedPartInventoryLevel.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getInStock()).asObject());
         tableColumnAddedPartPrice.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getPrice()).asObject());

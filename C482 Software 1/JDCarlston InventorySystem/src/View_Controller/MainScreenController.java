@@ -31,10 +31,7 @@ import javax.xml.bind.ValidationException;
  * @author Jennifer Carlston
  */
 public class MainScreenController extends BaseController {
-
-    private static Part _selectedPart;
-    private static Product _selectedProduct;
-
+    
     @FXML
     private TableView<Part> tableViewParts;
 
@@ -212,47 +209,15 @@ public class MainScreenController extends BaseController {
         loadTableViewProducts(getAllProducts());
     }
 
-    /**
-     *
-     * @param newActivePart
-     */
-    public static void setActivePart(Part newActivePart) {
-        _selectedPart = newActivePart;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public static Part getActivePart() {
-        return _selectedPart;
-    }
-
-    /**
-     *
-     * @param newActiveProduct
-     */
-    public static void setActiveProduct(Product newActiveProduct) {
-        _selectedProduct = newActiveProduct;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public static Product getActiveProduct() {
-        return _selectedProduct;
-    }
-
     private void bindTableColumnsParts() {
-        tableColumnPartID.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getID()).asObject());
+        tableColumnPartID.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getPartID()).asObject());
         tableColumnPartName.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
         tableColumnPartInventoryLevel.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getInStock()).asObject());
         tableColumnPartPrice.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getPrice()).asObject());
     }
 
     private void bindTableColumnsProducts() {
-        tableColumnProductID.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getID()).asObject());
+        tableColumnProductID.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getProductID()).asObject());
         tableColumnProductName.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
         tableColumnProductInventoryLevel.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getInStock()).asObject());
         tableColumnProductPrice.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getPrice()).asObject());
@@ -264,22 +229,5 @@ public class MainScreenController extends BaseController {
 
     private void loadTableViewProducts(ObservableList<Product> productList) {
         tableViewProducts.setItems(productList);
-    }
-
-    /**
-     *
-     * @param item
-     * @param itemtype
-     * @return
-     * @throws IOException
-     */
-    public static Optional<ButtonType> alertDelete(Item item, String itemtype) throws IOException {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.initModality(Modality.NONE);
-        alert.setTitle("Delete " + itemtype + " from Inventory");
-        alert.setHeaderText("Confirm Delete");
-        alert.setContentText("Are you sure you want to delete " + item.getName() + "?");
-
-        return alert.showAndWait();
     }
 }

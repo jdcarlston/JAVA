@@ -25,6 +25,41 @@ import javafx.stage.Stage;
  */
 public abstract class BaseController implements Initializable {
  
+    private static Part _activePart;
+    private static Product _activeProduct;
+
+   /**
+     *
+     * @param newPart
+     */
+    public static void setActivePart(Part newPart) {
+        _activePart = newPart;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public static Part getActivePart() {
+        return _activePart;
+    }
+
+    /**
+     *
+     * @param newProduct
+     */
+    public static void setActiveProduct(Product newProduct) {
+        _activeProduct = newProduct;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public static Product getActiveProduct() {
+        return _activeProduct;
+    }
+
     /**
      *
      * @param event
@@ -66,5 +101,22 @@ public abstract class BaseController implements Initializable {
         alert.setHeaderText("Not found");
         alert.setContentText("The search term entered does not match any known " + itemType.toLowerCase() + ".");
         alert.showAndWait();
+    }
+    
+    /**
+     *
+     * @param item
+     * @param itemtype
+     * @return
+     * @throws IOException
+     */
+    public static Optional<ButtonType> alertDelete(Item item, String itemtype) throws IOException {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.initModality(Modality.NONE);
+        alert.setTitle("Delete " + itemtype + " from Inventory");
+        alert.setHeaderText("Confirm Delete");
+        alert.setContentText("Are you sure you want to delete " + item.getName() + "?");
+
+        return alert.showAndWait();
     }
 }

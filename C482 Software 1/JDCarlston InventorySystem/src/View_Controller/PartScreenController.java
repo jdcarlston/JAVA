@@ -11,8 +11,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 
-import static View_Controller.MainScreenController.getActivePart;
-
 import java.io.IOException;
 import java.util.Optional;
 import javafx.scene.control.Alert;
@@ -77,18 +75,19 @@ public class PartScreenController extends BaseController {
 
     @FXML
     void clickPartInhouse(ActionEvent event) {
-            setInhouseVals();
+        setInhouseVals();
     }
 
     @FXML
     void clickPartOutsourced(ActionEvent event) {
-            setOutsourcedVals();
+        setOutsourcedVals();
     }
 
     @FXML
     void clickSave(ActionEvent event) throws IOException {
+
         if (activePart != null) {
-            clickUpdatePart(event);
+            clickModifyPart(event);
 
         } //Add New
         else {
@@ -100,11 +99,12 @@ public class PartScreenController extends BaseController {
      *
      */
     public PartScreenController() {
-        activePart = getActivePart();
+        activePart = MainScreenController.getActivePart();
     }
 
     /**
      * Initializes the controller class.
+     *
      * @param url
      * @param rb
      */
@@ -112,7 +112,7 @@ public class PartScreenController extends BaseController {
     public void initialize(URL url, ResourceBundle rb) {
         //If there is a part selected to modify
         if (activePart != null) {
-            setSelectedPartTextFields();
+            setActivePartTextFields();
         } //No part to modify
         else {
             lblPartScreen.setText("Add Part");
@@ -125,7 +125,7 @@ public class PartScreenController extends BaseController {
         }
     }
 
-    private void setSelectedPartTextFields() {
+    private void setActivePartTextFields() {
         lblPartScreen.setText("Modify Part");
 
         textFieldPartID.setText(Integer.toString(activePart.getPartID()));
@@ -137,12 +137,12 @@ public class PartScreenController extends BaseController {
 
         if (activePart instanceof InhousePart) {
             setInhouseVals();
-            
+
             //Set dynamic field to Machine ID
             textFieldPartDynamic.setText(Integer.toString(((InhousePart) activePart).getMachineID()));
         } else {
             setOutsourcedVals();
-            
+
             //Set dynamic Field to Company Name
             textFieldPartDynamic.setText(((OutsourcedPart) activePart).getCompanyName());
         }
@@ -152,13 +152,12 @@ public class PartScreenController extends BaseController {
         radioPartInhouse.setSelected(true);
         lblPartDynamic.setText("Machine ID");
         textFieldPartDynamic.setPromptText("Mach ID");
-        
-        if (activePart != null 
-                && activePart instanceof OutsourcedPart)
+
+        if (activePart != null
+                && activePart instanceof OutsourcedPart) {
             textFieldPartDynamic.setText("");
-        else if (activePart != null)
-        {
-            InhousePart p = ((InhousePart)activePart);
+        } else if (activePart != null) {
+            InhousePart p = ((InhousePart) activePart);
             textFieldPartDynamic.setText((Integer.toString(p.getMachineID())));
         }
     }
@@ -166,14 +165,13 @@ public class PartScreenController extends BaseController {
     private void setOutsourcedVals() {
         radioPartOutsourced.setSelected(true);
         lblPartDynamic.setText("Company");
-        textFieldPartDynamic.setPromptText("Company Name");      
+        textFieldPartDynamic.setPromptText("Company Name");
 
         if (activePart != null
-                && activePart instanceof InhousePart)
+                && activePart instanceof InhousePart) {
             textFieldPartDynamic.setText("");
-        else if (activePart != null)
-        {
-            OutsourcedPart p = (OutsourcedPart)activePart;
+        } else if (activePart != null) {
+            OutsourcedPart p = (OutsourcedPart) activePart;
             textFieldPartDynamic.setText(p.getCompanyName());
         }
     }
@@ -185,50 +183,53 @@ public class PartScreenController extends BaseController {
         String min = textFieldPartMin.getText();
         String max = textFieldPartMax.getText();
         String dynamic = textFieldPartDynamic.getText();
-        
+
         if (radioPartInhouse.isSelected()) {
             InhousePart newPart = new InhousePart();
-            newPart.setPartID(getNewPartID());
-            newPart.setName(name);
-            newPart.setInStock(tryParseInt(inventory));
-            newPart.setPrice(tryParseDouble(price));
-            newPart.setMin(tryParseInt(min));
-            newPart.setMax(tryParseInt(max));
-            newPart.setMachineID(tryParseInt(dynamic));
-
-            //System.out.println(newPart.getName());
 
             try {
+                newPart.setPartID(getNewPartID());
+                newPart.setName(name);
+                newPart.setInStock(inventory);
+                newPart.setPrice(price);
+                newPart.setMin(min);
+                newPart.setMax(max);
+                newPart.setMachineID(dynamic);
+
+                //System.out.println(newPart.getName());
                 newPart.isValid();
                 addPart(newPart);
-                
                 showFxScreen(event, "MainScreen.fxml");
+
             } catch (ValidationException e) {
                 alertInvalid("In-House Part", e.getMessage());
             }
         } else {
             OutsourcedPart newPart = new OutsourcedPart();
 
-            newPart.setPartID(activePart.getPartID());
-            newPart.setName(name);
-            newPart.setInStock(Integer.parseInt(inventory));
-            newPart.setPrice(Double.parseDouble(price));
-            newPart.setMin(Integer.parseInt(min));
-            newPart.setMax(Integer.parseInt(max));
-            newPart.setCompanyName(dynamic);
-
             try {
+                newPart.setPartID(getNewPartID());
+                newPart.setName(name);
+                newPart.setInStock(inventory);
+                newPart.setPrice(price);
+                newPart.setMin(min);
+                newPart.setMax(max);
+                newPart.setCompanyName(dynamic);
+
                 newPart.isValid();
+
                 addPart(newPart);
+                showFxScreen(event, "MainScreen.fxml");
+
             } catch (ValidationException e) {
                 alertInvalid("Outsourced Part", e.getMessage());
             }
         }
     }
 
-    private void clickUpdatePart(ActionEvent event) throws IOException {
+    private void clickModifyPart(ActionEvent event) throws IOException {
         boolean inhouse = radioPartInhouse.isSelected();
-        Integer id = activePart.getID();
+        Integer id = activePart.getPartID();
         String name = textFieldPartName.getText();
         String inventory = textFieldPartInventory.getText();
         String price = textFieldPartPrice.getText();
@@ -236,40 +237,48 @@ public class PartScreenController extends BaseController {
         String max = textFieldPartMax.getText();
         String dynamic = textFieldPartDynamic.getText();
 
-        if (activePart instanceof InhousePart 
-                && inhouse) {
+        System.out.println("ModifyPart " + id + " inhouse: " + inhouse + " instanceof:" + (activePart instanceof InhousePart));
+        
+        if (inhouse) {
             InhousePart newPart = new InhousePart();
 
-            newPart.setPartID(id);
-            newPart.setName(name);
-            newPart.setInStock(tryParseInt(inventory));
-            newPart.setPrice(tryParseDouble(price));
-            newPart.setMin(tryParseInt(min));
-            newPart.setMax(tryParseInt(max));
-            newPart.setMachineID(tryParseInt(dynamic));
-
             try {
+                newPart.setPartID(id);
+                newPart.setName(name);
+                newPart.setInStock(inventory);
+                newPart.setPrice(price);
+                newPart.setMin(min);
+                newPart.setMax(max);
+                newPart.setMachineID(dynamic);
+
                 newPart.isValid();
+
                 updatePart(newPart);
-                
+
                 showFxScreen(event, "MainScreen.fxml");
             } catch (ValidationException e) {
                 alertInvalid("In-House Part", e.getMessage());
             }
-        } else if (activePart instanceof OutsourcedPart) {
+        } else {
             OutsourcedPart newPart = new OutsourcedPart();
 
-            newPart.setPartID(activePart.getPartID());
-            newPart.setName(name);
-            newPart.setInStock(tryParseInt(inventory));
-            newPart.setPrice(tryParseDouble(price));
-            newPart.setMin(tryParseInt(min));
-            newPart.setMax(tryParseInt(max));
-            newPart.setCompanyName(dynamic);
-
             try {
+                newPart.setPartID(id);
+                newPart.setName(name);
+                newPart.setInStock(inventory);
+                newPart.setPrice(price);
+                newPart.setMin(min);
+                newPart.setMax(max);
+                newPart.setCompanyName(dynamic);
+                System.out.println("got here");
+
+                
                 newPart.isValid();
+
                 updatePart(newPart);
+
+                showFxScreen(event, "MainScreen.fxml");
+
             } catch (ValidationException e) {
                 alertInvalid("Outsourced Part", e.getMessage());
             }

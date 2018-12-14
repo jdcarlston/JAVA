@@ -13,7 +13,7 @@ import javafx.beans.property.*;
  */
 public class OutsourcedPart extends Part {
 
-    private StringProperty _companyName;
+    private String _companyName;
 
     /**
      *
@@ -54,7 +54,7 @@ public class OutsourcedPart extends Part {
      * @param newCompanyName
      */
     public void setCompanyName(String newCompanyName) {
-        _companyName.set(newCompanyName);
+        _companyName = newCompanyName;
     }
 
     /**
@@ -62,6 +62,6 @@ public class OutsourcedPart extends Part {
      * @return
      */
     public String getCompanyName() {
-        return _companyName.get();
+        return _companyName;
     }
 }

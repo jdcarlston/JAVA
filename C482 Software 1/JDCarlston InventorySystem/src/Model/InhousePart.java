@@ -57,6 +57,12 @@ public class InhousePart extends Part {
     {
         _machineID = newMachineID;
     }
+    public void setMachineID(String newMachineID)
+    {
+        //MachineID is not required
+        if (newMachineID.length() > 0)
+            _machineID = tryParseInt(newMachineID);
+    }
     
     /**
      *
@@ -71,7 +77,7 @@ public class InhousePart extends Part {
         boolean isValid = super.isValid();
         
         if (getMachineID() < 0) {
-            throw new ValidationException("Machine ID for this item must be 0 or greater.");
+            throw new ValidationException("{Machine ID} for this item must be 0 or greater.");
         }
         
         return isValid;
