@@ -42,25 +42,9 @@ import javax.xml.bind.ValidationException;
 public class ProductScreenController extends BaseController {
 
     private final Product activeProduct;
+    //private Product _productToUpsert = new Product(); 
 
-    private Product _productToAdd;
     private Part _partToAssociate;
-
-    /**
-     *
-     * @param newProduct
-     */
-    public void setProductToAdd(Product newProduct) {
-        _productToAdd = newProduct;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public Product getProductToAdd() {
-        return _productToAdd;
-    }
 
     /**
      *
@@ -118,16 +102,16 @@ public class ProductScreenController extends BaseController {
     private TableView<Part> tableViewAssociatedParts;
 
     @FXML
-    private TableColumn<Part, Integer> tableColumnAddedPartID;
+    private TableColumn<Part, Integer> tableColumnAssociatedPartID;
 
     @FXML
-    private TableColumn<Part, String> tableColumnAddedPartName;
+    private TableColumn<Part, String> tableColumnAssociatedPartName;
 
     @FXML
-    private TableColumn<Part, Integer> tableColumnAddedPartInventoryLevel;
+    private TableColumn<Part, Integer> tableColumnAssociatedPartInventoryLevel;
 
     @FXML
-    private TableColumn<Part, Double> tableColumnAddedPartPrice;
+    private TableColumn<Part, Double> tableColumnAssociatedPartPrice;
 
     @FXML
     private Button btnDeletePart;
@@ -151,13 +135,12 @@ public class ProductScreenController extends BaseController {
     void clickAddPart(ActionEvent event) {
         setPartToAssociate(tableViewAllParts.getSelectionModel().getSelectedItem());
 
-        try {
-            getProductToAdd().addAssociatedPart(getPartToAssociate());
-            getProductToAdd().isValid();
-        } catch (ValidationException e) {
-            alertInvalid("Associated Part", e.getMessage());
+        if (getPartToAssociate() == null) {
+            alertInvalid("Part", "Please select a {Part} to associate.");
+        } else {
+            activeProduct.addAssociatedPart(getPartToAssociate());
+            loadTableViewAssociatedParts(activeProduct.getAssociatedParts());
         }
-        loadTableViewAddedParts(activeProduct.getAssociatedParts());
 
     }
 
@@ -167,7 +150,7 @@ public class ProductScreenController extends BaseController {
         alert.initModality(Modality.NONE);
         alert.setTitle("Cancel " + lblProductScreen.getText());
         alert.setHeaderText("Confirm Cancel");
-        alert.setContentText("Are you sure you want to exit the " + lblProductScreen.getText() + " screen?");
+        alert.setContentText("Are you sure you want to exit the {" + lblProductScreen.getText() + "} screen?");
         Optional<ButtonType> result = alert.showAndWait();
 
         if (result.get() == ButtonType.OK) {
@@ -185,29 +168,32 @@ public class ProductScreenController extends BaseController {
     void clickDeletePart(ActionEvent event) throws IOException {
         Part partToDelete = (tableViewAssociatedParts.getSelectionModel().getSelectedItem());
 
-        //System.out.println(activeProduct.getName() + " delete part #" + partToDelete);
-        Optional<ButtonType> result = alertDelete(partToDelete, "Part");
+        if (partToDelete == null) {
+            alertInvalid("Part", "Please select a {Part} to dissociate.");
+        } else {
+            Optional<ButtonType> result = alertDelete(partToDelete);
 
-        if (result.get() == ButtonType.OK) {
+            if (result.get() == ButtonType.OK) {
 
-            try {
-                activeProduct.removeAssociatedPart(partToDelete);
-                loadTableViewAddedParts(activeProduct.getAssociatedParts());
-            } catch (ValidationException e) {
-                alertInvalid("Product Operation", e.getMessage());
+                try {
+                    activeProduct.removeAssociatedPart(partToDelete);
+                    loadTableViewAssociatedParts(activeProduct.getAssociatedParts());
+                } catch (ValidationException e) {
+                    alertInvalid("Product Operation", e.getMessage());
+                }
             }
         }
     }
 
     @FXML
     void clickSave(ActionEvent event) throws IOException {
-        if (activeProduct != null) {
-            clickModifyProduct(event);
+        if (activeProduct.getProductID() != getNewProductID()) {
+
+            saveModifiedProduct(event);
 
         } //Add New
         else {
-            activeProduct.setProductID(Inventory.getNewProductID());
-            clickAddProduct(event);
+            saveNewProduct(event);
         }
     }
 
@@ -221,7 +207,7 @@ public class ProductScreenController extends BaseController {
                 loadTableViewAllParts(foundParts);
             }
         } catch (ValidationException e) {
-            alertInvalid("Search Parts", e.getMessage());
+            alertInvalid("Part Search", e.getMessage());
         }
     }
 
@@ -229,7 +215,14 @@ public class ProductScreenController extends BaseController {
      *
      */
     public ProductScreenController() {
-        activeProduct = MainScreenController.getActiveProduct();
+
+        if (MainScreenController.getActiveProduct() != null
+                && MainScreenController.getActiveProduct().getProductID() > 0) {
+            activeProduct = MainScreenController.getActiveProduct();
+        } else {
+            activeProduct = new Product();
+            activeProduct.setProductID(getNewProductID());
+        }
     }
 
     /**
@@ -241,42 +234,50 @@ public class ProductScreenController extends BaseController {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
-        bindTableColumnsAllParts();
-        bindTableColumnsAddedParts();
-
-        if (activeProduct != null) {
-            setModifyProductFields();
-        } else {
-            lblProductScreen.setText("Add Product");
-
-            //Auto-generate latest ID for adding parts
-            int newPartID = getNewPartID();
-            textFieldProductID.setText(Integer.toString(newPartID));
+        if (MainScreenController.getActiveProduct() == null
+                || MainScreenController.getActiveProduct().getProductID() <= 0) {
+            activeProduct.setProductID(getNewProductID());
         }
 
+        setTextFields();
+        setScreenLabel();
+
+        bindTableColumnsAllParts();
+        bindTableColumnsAssociatedParts();
+
+        loadTableViewAssociatedParts(activeProduct.getAssociatedParts());
         loadTableViewAllParts(getAllParts());
     }
 
-    private void setModifyProductFields() {
-        lblProductScreen.setText("Modify Product");
+    private void setScreenLabel() {
+        if (activeProduct.getProductID() == getNewProductID()) {
+            lblProductScreen.setText("Add Product");
+        } else {
+            lblProductScreen.setText("Modify Product");
+        }
+    }
 
+    private void setTextFields() {
         textFieldProductID.setText(Integer.toString(activeProduct.getProductID()));
-        textFieldProductName.setText(activeProduct.getName());
-        textFieldProductInventory.setText(Integer.toString(activeProduct.getInStock()));
-        textFieldProductPrice.setText(Double.toString(activeProduct.getPrice()));
-        textFieldProductMax.setText(Integer.toString(activeProduct.getMax()));
-        textFieldProductMin.setText(Integer.toString(activeProduct.getMin()));
+
+        if (activeProduct.getProductID() != getNewProductID()) {
+            textFieldProductName.setText(activeProduct.getName());
+            textFieldProductInventory.setText(Integer.toString(activeProduct.getInStock()));
+            textFieldProductPrice.setText(Double.toString(activeProduct.getPrice()));
+            textFieldProductMax.setText(Integer.toString(activeProduct.getMax()));
+            textFieldProductMin.setText(Integer.toString(activeProduct.getMin()));
+        }
 
         //Load Added Parts List
-        loadTableViewAddedParts(activeProduct.getAssociatedParts());
+        loadTableViewAssociatedParts(activeProduct.getAssociatedParts());
     }
 
-    private void clickAddProduct(ActionEvent event) throws IOException {
-        setProductToAdd(getProductByTextFields());
+    private void saveNewProduct(ActionEvent event) throws IOException {
+        setProductFromTextFields();
 
         try {
-            getProductToAdd().isValid();
-            addProduct(getProductToAdd());
+            activeProduct.isValid();
+            addProduct(activeProduct);
 
             showFxScreen(event, "MainScreen.fxml");
         } catch (ValidationException e) {
@@ -284,12 +285,12 @@ public class ProductScreenController extends BaseController {
         }
     }
 
-    private void clickModifyProduct(ActionEvent event) throws IOException {
-        Product productToUpdate = getProductByTextFields();
+    private void saveModifiedProduct(ActionEvent event) throws IOException {
+        setProductFromTextFields();
 
         try {
-            productToUpdate.isValid();
-            updateProduct(productToUpdate);
+            activeProduct.isValid();
+            updateProduct(activeProduct);
 
             showFxScreen(event, "MainScreen.fxml");
         } catch (ValidationException e) {
@@ -297,7 +298,7 @@ public class ProductScreenController extends BaseController {
         }
     }
 
-    private Product getProductByTextFields() {
+    private void setProductFromTextFields() {
         String id = textFieldProductID.getText();
         String name = textFieldProductName.getText();
         String inventory = textFieldProductInventory.getText();
@@ -305,16 +306,12 @@ public class ProductScreenController extends BaseController {
         String min = textFieldProductMin.getText();
         String max = textFieldProductMax.getText();
 
-        Product newProduct = new Product();
-
-        newProduct.setProductID(Integer.parseInt(id));
-        newProduct.setName(name);
-        newProduct.setInStock(Integer.parseInt(inventory));
-        newProduct.setPrice(Double.parseDouble(price));
-        newProduct.setMin(Integer.parseInt(min));
-        newProduct.setMax(Integer.parseInt(max));
-
-        return newProduct;
+        activeProduct.setProductID(Item.tryParseInt(id));
+        activeProduct.setName(name);
+        activeProduct.setInStock(Item.tryParseInt(inventory));
+        activeProduct.setPrice(Item.tryParseDouble(price));
+        activeProduct.setMin(Item.tryParseInt(min));
+        activeProduct.setMax(Item.tryParseInt(max));
     }
 
     private void bindTableColumnsAllParts() {
@@ -324,18 +321,18 @@ public class ProductScreenController extends BaseController {
         tableColumnAllPartPrice.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getPrice()).asObject());
     }
 
-    private void bindTableColumnsAddedParts() {
-        tableColumnAddedPartID.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getPartID()).asObject());
-        tableColumnAddedPartName.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
-        tableColumnAddedPartInventoryLevel.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getInStock()).asObject());
-        tableColumnAddedPartPrice.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getPrice()).asObject());
+    private void bindTableColumnsAssociatedParts() {
+        tableColumnAssociatedPartID.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getPartID()).asObject());
+        tableColumnAssociatedPartName.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
+        tableColumnAssociatedPartInventoryLevel.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getInStock()).asObject());
+        tableColumnAssociatedPartPrice.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getPrice()).asObject());
     }
 
     private void loadTableViewAllParts(ObservableList<Part> partList) {
         tableViewAllParts.setItems(partList);
     }
 
-    private void loadTableViewAddedParts(ObservableList<Part> partList) {
+    private void loadTableViewAssociatedParts(ObservableList<Part> partList) {
         tableViewAssociatedParts.setItems(partList);
     }
 }

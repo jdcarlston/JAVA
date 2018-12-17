@@ -64,4 +64,8 @@ public class OutsourcedPart extends Part {
     public String getCompanyName() {
         return _companyName;
     }
+    
+    public String getItemType() {
+        return "Outsourced Part";
+    }
 }

@@ -99,23 +99,37 @@ public abstract class BaseController implements Initializable {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Search Error");
         alert.setHeaderText("Not found");
-        alert.setContentText("The search term entered does not match any known " + itemType.toLowerCase() + ".");
+        alert.setContentText("The search term entered does not match any known {" + itemType + "}.");
         alert.showAndWait();
     }
     
     /**
      *
-     * @param item
-     * @param itemtype
+     * @param part
      * @return
      * @throws IOException
      */
-    public static Optional<ButtonType> alertDelete(Item item, String itemtype) throws IOException {
+    public static Optional<ButtonType> alertDelete(Part part) throws IOException {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.initModality(Modality.NONE);
-        alert.setTitle("Delete " + itemtype + " from Inventory");
+        alert.setTitle("Delete " + part.getItemType() + " from List");
         alert.setHeaderText("Confirm Delete");
-        alert.setContentText("Are you sure you want to delete " + item.getName() + "?");
+        alert.setContentText("Are you sure you want to remove {" + part.getItemType() + " #" + part.getPartID() + "}?");
+
+        return alert.showAndWait();
+    }
+    /**
+     *
+     * @param product
+     * @return
+     * @throws IOException
+     */
+    public static Optional<ButtonType> alertDelete(Product product) throws IOException {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.initModality(Modality.NONE);
+        alert.setTitle("Delete Product from List");
+        alert.setHeaderText("Confirm Delete");
+        alert.setContentText("Are you sure you want to remove {Product #" + product.getProductID() + "}?");
 
         return alert.showAndWait();
     }

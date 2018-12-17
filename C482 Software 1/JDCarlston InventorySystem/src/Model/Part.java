@@ -46,5 +46,9 @@ public abstract class Part extends Item {
     public int getPartID()
     {
         return getID();        
+    }    
+        
+    public String getItemType() {
+        return "Part";
     }
 }

@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import javafx.beans.property.*;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -31,7 +33,7 @@ import javax.xml.bind.ValidationException;
  * @author Jennifer Carlston
  */
 public class MainScreenController extends BaseController {
-    
+
     @FXML
     private TableView<Part> tableViewParts;
 
@@ -75,6 +77,10 @@ public class MainScreenController extends BaseController {
 
     @FXML
     void clickAddProduct(ActionEvent event) throws IOException {
+        /*Product productToAdd = new Product();
+        productToAdd.setProductID(getNewProductID());
+        setActiveProduct(productToAdd);*/
+
         showFxScreen(event, "ProductScreen.fxml");
     }
 
@@ -87,7 +93,7 @@ public class MainScreenController extends BaseController {
             alertInvalid(itemType + " Operation", "There must be at least one " + itemType + ".");
         } else */
         if (partToDelete != null) {
-            Optional<ButtonType> result = alertDelete(partToDelete, itemType);
+            Optional<ButtonType> result = alertDelete(partToDelete);
 
             if (result.get() == ButtonType.OK) {
 
@@ -95,11 +101,11 @@ public class MainScreenController extends BaseController {
                     deletePart(partToDelete.getPartID());
                     loadTableViewParts(getAllParts());
                 } catch (ValidationException e) {
-                    alertInvalid(itemType + " Invalid", e.getMessage());
+                    alertInvalid(itemType, e.getMessage());
                 }
             }
         } else {
-            alertInvalid("Selection", "Please select a " + itemType + " to delete.");
+            alertInvalid("Selection", "Please select a {" + itemType + "} to delete.");
         }
     }
 
@@ -107,20 +113,20 @@ public class MainScreenController extends BaseController {
     void clickDeleteProduct(ActionEvent event) throws IOException {
         Product productToDelete = tableViewProducts.getSelectionModel().getSelectedItem();
         String itemType = "Product";
-        
+
         if (productToDelete != null) {
-            Optional<ButtonType> result = alertDelete(productToDelete, itemType);
+            Optional<ButtonType> result = alertDelete(productToDelete);
 
             if (result.get() == ButtonType.OK) {
                 try {
                     removeProduct(productToDelete.getProductID());
                     loadTableViewProducts(getAllProducts());
                 } catch (ValidationException e) {
-                    alertInvalid(itemType + " Invalid", e.getMessage());
+                    alertInvalid(itemType, e.getMessage());
                 }
             }
         } else {
-            alertInvalid("Selection", "Please select a " + itemType + " to delete.");
+            alertInvalid("Selection", "Please select a {" + itemType + "} to delete.");
         }
     }
 
@@ -145,7 +151,7 @@ public class MainScreenController extends BaseController {
         setActivePart(tableViewParts.getSelectionModel().getSelectedItem());
 
         if (getActivePart() == null) {
-            alertInvalid("Part", "Please select a Part to modify.");
+            alertInvalid("Part", "Please select a {Part} to modify.");
         } else {
             showFxScreen(event, "PartScreen.fxml");
         }
@@ -157,7 +163,7 @@ public class MainScreenController extends BaseController {
         setActiveProduct(tableViewProducts.getSelectionModel().getSelectedItem());
 
         if (getActiveProduct() == null) {
-            alertInvalid("Product", "Please selecte a Product to modify");
+            alertInvalid("Product", "Please selecte a {Product} to modify");
         } else {
             showFxScreen(event, "ProductScreen.fxml");
         }
@@ -173,7 +179,7 @@ public class MainScreenController extends BaseController {
                 loadTableViewParts(foundParts);
             }
         } catch (ValidationException e) {
-            alertInvalid("Search Parts", e.getMessage());
+            alertInvalid("Part Search", e.getMessage());
         }
     }
 
@@ -187,7 +193,7 @@ public class MainScreenController extends BaseController {
                 loadTableViewProducts(foundProducts);
             }
         } catch (ValidationException e) {
-            alertInvalid("Search Products", e.getMessage());
+            alertInvalid("Product Search", e.getMessage());
         }
     }
 

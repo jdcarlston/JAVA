@@ -65,7 +65,7 @@ public class PartScreenController extends BaseController {
         alert.initModality(Modality.NONE);
         alert.setTitle("Cancel " + lblPartScreen.getText());
         alert.setHeaderText("Confirm Cancel");
-        alert.setContentText("Are you sure you want to exit the " + lblPartScreen.getText() + " screen?");
+        alert.setContentText("Are you sure you want to exit the {" + lblPartScreen.getText() + "} screen?");
         Optional<ButtonType> result = alert.showAndWait();
 
         if (result.get() == ButtonType.OK) {
@@ -196,13 +196,12 @@ public class PartScreenController extends BaseController {
                 newPart.setMax(max);
                 newPart.setMachineID(dynamic);
 
-                //System.out.println(newPart.getName());
                 newPart.isValid();
                 addPart(newPart);
                 showFxScreen(event, "MainScreen.fxml");
 
             } catch (ValidationException e) {
-                alertInvalid("In-House Part", e.getMessage());
+                alertInvalid(newPart.getItemType(), e.getMessage());
             }
         } else {
             OutsourcedPart newPart = new OutsourcedPart();
@@ -222,7 +221,7 @@ public class PartScreenController extends BaseController {
                 showFxScreen(event, "MainScreen.fxml");
 
             } catch (ValidationException e) {
-                alertInvalid("Outsourced Part", e.getMessage());
+                alertInvalid(newPart.getItemType(), e.getMessage());
             }
         }
     }
@@ -236,8 +235,6 @@ public class PartScreenController extends BaseController {
         String min = textFieldPartMin.getText();
         String max = textFieldPartMax.getText();
         String dynamic = textFieldPartDynamic.getText();
-
-        System.out.println("ModifyPart " + id + " inhouse: " + inhouse + " instanceof:" + (activePart instanceof InhousePart));
         
         if (inhouse) {
             InhousePart newPart = new InhousePart();
@@ -257,7 +254,7 @@ public class PartScreenController extends BaseController {
 
                 showFxScreen(event, "MainScreen.fxml");
             } catch (ValidationException e) {
-                alertInvalid("In-House Part", e.getMessage());
+                alertInvalid(newPart.getItemType(), e.getMessage());
             }
         } else {
             OutsourcedPart newPart = new OutsourcedPart();
@@ -270,8 +267,6 @@ public class PartScreenController extends BaseController {
                 newPart.setMin(min);
                 newPart.setMax(max);
                 newPart.setCompanyName(dynamic);
-                System.out.println("got here");
-
                 
                 newPart.isValid();
 
@@ -280,7 +275,7 @@ public class PartScreenController extends BaseController {
                 showFxScreen(event, "MainScreen.fxml");
 
             } catch (ValidationException e) {
-                alertInvalid("Outsourced Part", e.getMessage());
+                alertInvalid(newPart.getItemType(), e.getMessage());
             }
         }
     }

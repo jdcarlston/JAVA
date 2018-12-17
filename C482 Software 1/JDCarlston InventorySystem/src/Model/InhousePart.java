@@ -71,7 +71,11 @@ public class InhousePart extends Part {
     public int getMachineID()
     {
         return _machineID;        
-    }    
+    }        
+            
+    public String getItemType() {
+        return "In-House Part";
+    }
      
     public boolean isValid() throws ValidationException {  
         boolean isValid = super.isValid();

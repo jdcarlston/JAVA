@@ -158,6 +158,8 @@ public abstract class Item {
     public int getMax() {
         return _max;
     }
+    
+    public abstract String getItemType(); 
 
     /**
      *
@@ -186,7 +188,7 @@ public abstract class Item {
         }
 
         if (getInStock() < 0) {
-            throw new ValidationException("{In Stock} for this item cannot be less than zero.");
+            throw new ValidationException("{Inv} for this item cannot be less than zero.");
         }
 
         if (getPrice() < 0) {
@@ -213,7 +215,7 @@ public abstract class Item {
      * @param value
      * @return
      */
-    protected static Integer tryParseInt(String value) {
+    public static Integer tryParseInt(String value) {
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
@@ -226,7 +228,7 @@ public abstract class Item {
      * @param value
      * @return
      */
-     static Double tryParseDouble(String value) {
+    public static Double tryParseDouble(String value) {
         try {
             return Double.parseDouble(value);
         } catch (NumberFormatException e) {

@@ -49,7 +49,7 @@ public class Inventory {
      * @return
      */
     public static int getCountParts() {
-        return _allParts.size();
+        return getAllParts().size();
     }
 
     /**
@@ -57,7 +57,7 @@ public class Inventory {
      * @return
      */
     public static int getCountProducts() {
-        return _allProducts.size();
+        return getAllProducts().size();
     }
 
     /**
@@ -81,7 +81,7 @@ public class Inventory {
      * @param part
      */
     public static void addPart(Part part) {
-        _allParts.add(part);
+        getAllParts().add(part);
     }
 
     /**
@@ -89,7 +89,7 @@ public class Inventory {
      * @param productToAdd
      */
     public static void addProduct(Product productToAdd) {
-        _allProducts.add(productToAdd);
+        getAllProducts().add(productToAdd);
     }
 
     /**
@@ -99,18 +99,45 @@ public class Inventory {
      * @throws ValidationException
      */
     public static boolean deletePart(int partID) throws ValidationException {
-        if (getCountParts() <= 1 
+        if (getCountParts() <= 1
                 && getCountProducts() > 0) {
-            throw new ValidationException("There must be at least one part in the inventory.");
+            throw new ValidationException("There must be at least one {Part} in the IMS.");
         } else {
-            for (Part p : _allParts) {
-                if (p.getID() == partID) {
-                    _allParts.remove(p);
+
+            //Loop through all parts in inventory
+            for (Part part : getAllParts()) {
+                if (part.getPartID() == partID) {
+
+                    //Loop through all products, remove part from product if possible
+                    for (Product product : getAllProducts()) {
+
+                        //Check if the product has part associated
+                        if (product.getAssociatedParts().contains(part)
+                                && product.getCountAssociatedParts() > 1) {
+
+                            //Dissociate Part from Product
+                            product.getAssociatedParts().remove(part);
+
+                        } else if (product.getAssociatedParts().contains(part)) {
+                            throw new ValidationException(
+                                    "Please remove {Part #"
+                                    + partID + "} from  {Product #" 
+                                    + product.getProductID() + "} first."
+                                    + "\n\n{Product #"
+                                    + product.getProductID() 
+                                    + "} must have at least one part to be valid.");
+                        }
+                    }
+
+                    //Remove Part from IMS
+                    getAllParts().remove(part);
+
                     return true;
                 }
             }
+
+            return false;
         }
-        return false;
     }
 
     /**
@@ -121,14 +148,14 @@ public class Inventory {
      */
     public static boolean removeProduct(int productID) throws ValidationException {
 
-        for (Product p : _allProducts) {
-            if (p.getID() == productID
+        for (Product p : getAllProducts()) {
+            if (p.getProductID() == productID
                     && p.getCountAssociatedParts() > 0) {
-                throw new ValidationException("Products with at least one part cannot be deleted.");
+                throw new ValidationException("{Products} with at least one {Part} cannot be deleted.");
             }
 
-            if (p.getID() == productID) {
-                _allProducts.remove(p);
+            if (p.getProductID() == productID) {
+                getAllProducts().remove(p);
                 return true;
             }
         }
@@ -142,8 +169,8 @@ public class Inventory {
      * @return
      */
     public static Part lookupPart(int partID) {
-        for (Part p : _allParts) {
-            if (p.getID() == partID) {
+        for (Part p : getAllParts()) {
+            if (p.getPartID() == partID) {
                 return p;
             }
         }
@@ -157,8 +184,8 @@ public class Inventory {
      * @return
      */
     public static Product lookupProduct(int productID) {
-        for (Product p : _allProducts) {
-            if (p.getID() == productID) {
+        for (Product p : getAllProducts()) {
+            if (p.getProductID() == productID) {
                 return p;
             }
         }
@@ -180,23 +207,24 @@ public class Inventory {
 
         if (searchTerm.length() > 0
                 && searchInt > 0) {
-            
+
             Part foundPart = lookupPart(searchInt);
-            
-            if (foundPart != null)
+
+            if (foundPart != null) {
                 isAdded = foundParts.add(foundPart);
+            }
 
         } else if (searchTerm.length() > 0) {
 
             //Match Regex Patterns
-            for (Part p : _allParts) {
-                
+            for (Part p : getAllParts()) {
+
                 searchTerm = ".*" + searchTerm.trim() + ".*";
                 Pattern regexPattern = Pattern.compile(searchTerm, Pattern.CASE_INSENSITIVE);
                 Matcher regexMatcherName = regexPattern.matcher(p.getName().toLowerCase());
-                Matcher regexMatcherID = regexPattern.matcher(Integer.toString(p.getID()));
+                Matcher regexMatcherID = regexPattern.matcher(Integer.toString(p.getPartID()));
 
-                if (regexMatcherName.matches() 
+                if (regexMatcherName.matches()
                         || regexMatcherID.matches()) {
                     isAdded = foundParts.add(p);
                 }
@@ -207,7 +235,7 @@ public class Inventory {
         }
 
         if (!isAdded) {
-            throw new ValidationException("Part could not be found.");
+            throw new ValidationException("{Part} matching {" + searchTerm + "} could not be found.");
         }
 
         return foundParts;
@@ -225,21 +253,21 @@ public class Inventory {
         ObservableList<Product> foundProducts = FXCollections.observableArrayList();
         boolean isAdded = false;
 
-        if (searchTerm.length() > 0 
+        if (searchTerm.length() > 0
                 && searchInt > 0) {
             Product foundProduct = lookupProduct(searchInt);
             isAdded = foundProducts.add(foundProduct);
 
         } else if (searchTerm.length() > 0) {
 
-            for (Product p : _allProducts) {
-                
+            for (Product p : getAllProducts()) {
+
                 searchTerm = ".*" + searchTerm.trim() + ".*";
                 Pattern regexPattern = Pattern.compile(searchTerm, Pattern.CASE_INSENSITIVE);
                 Matcher regexMatcherName = regexPattern.matcher(p.getName());
-                Matcher regexMatcherID = regexPattern.matcher(Integer.toString(p.getID()));
+                Matcher regexMatcherID = regexPattern.matcher(Integer.toString(p.getProductID()));
 
-                if (regexMatcherName.matches() 
+                if (regexMatcherName.matches()
                         || regexMatcherID.matches()) {
                     isAdded = foundProducts.add(p);
                 }
@@ -250,7 +278,7 @@ public class Inventory {
         }
 
         if (!isAdded) {
-            throw new ValidationException("Product could not be found.");
+            throw new ValidationException("{Product} matching {" + searchTerm + "} could not be found.");
         }
 
         return foundProducts;
@@ -261,13 +289,11 @@ public class Inventory {
      * @param partUpdated
      */
     public static void updatePart(Part partUpdated) {
-        Part foundPart = lookupPart(partUpdated.getID());
+        Part foundPart = lookupPart(partUpdated.getPartID());
         int index = getAllParts().indexOf(foundPart);
-        
-        System.out.println("index: " + index);
-        
+
         if (foundPart != null) {
-            _allParts.set(index, partUpdated);
+            getAllParts().set(index, partUpdated);
         }
     }
 
@@ -276,11 +302,11 @@ public class Inventory {
      * @param productUpdated
      */
     public static void updateProduct(Product productUpdated) {
-        Product foundProduct = lookupProduct(productUpdated.getID());
-        int index = getAllProducts().indexOf(foundProduct);    
-        
+        Product foundProduct = lookupProduct(productUpdated.getProductID());
+        int index = getAllProducts().indexOf(foundProduct);
+
         if (foundProduct != null) {
-            _allProducts.set(index, productUpdated);
+            getAllProducts().set(index, productUpdated);
         }
     }
 }

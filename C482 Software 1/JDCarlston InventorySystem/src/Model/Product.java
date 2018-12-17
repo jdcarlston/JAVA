@@ -68,7 +68,10 @@ public class Product extends Item {
     public int getProductID() {
         return getID();
     }
-
+    
+    public String getItemType() {
+        return "Product";
+    }
     /**
      *
      * @return
@@ -90,10 +93,10 @@ public class Product extends Item {
      * @param partToAdd
      * @throws ValidationException
      */
-    public void addAssociatedPart(Part partToAdd) throws ValidationException {
-        partToAdd.isValid();
+    public void addAssociatedPart(Part partToAdd) {
         _associatedParts.add(partToAdd);
     }
+
 
     /**
      *
@@ -101,10 +104,10 @@ public class Product extends Item {
      * @throws ValidationException
      */
     public void removeAssociatedPart(Part partToRemove) throws ValidationException {
-        if (getCountAssociatedParts() > 1)
+        //if (getCountAssociatedParts() > 1)
             _associatedParts.remove(partToRemove);
-        else
-            throw new ValidationException("Products must have at least one part.");
+        //else
+        //    throw new ValidationException("Products must have at least one part.");
     }
     
     /**
@@ -121,7 +124,7 @@ public class Product extends Item {
      */
     public Part lookupAssociatedPart(int partIDToLookup) {
         for (Part p : _associatedParts) {
-            if (p.getID() == partIDToLookup) {
+            if (p.getPartID() == partIDToLookup) {
                 return p;
             }
         }
@@ -143,7 +146,7 @@ public class Product extends Item {
         }*/
 
         // the sum of parts must be less than the price of the product
-        if (totalPartsPrice > getPrice()) {
+        if (totalPartsPrice >= getPrice()) {
             throw new ValidationException("The product price must be greater than total cost of associated parts.");
         }
 
