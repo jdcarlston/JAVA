@@ -61,7 +61,7 @@ public class JDCarlstonInventorySystem extends Application {
         Product pr2 = new Product(2, "Pr2", 32.00, 5, 1, 5);
 
         Inventory.addProduct(pr1);
-        //pr1.addAssociatedPart(pa1);
+        pr1.addAssociatedPart(pa1);
 
         Inventory.addProduct(pr2);
         pr2.addAssociatedPart(pa1);
