@@ -47,7 +47,7 @@ public class MainScreenController extends BaseController {
     private TableColumn<Part, Integer> tableColumnPartInventoryLevel;
 
     @FXML
-    private TableColumn<Part, Double> tableColumnPartPrice;
+    private TableColumn<Part, String> tableColumnPartPrice;
 
     @FXML
     private TextField textFieldSearchParts;
@@ -65,7 +65,7 @@ public class MainScreenController extends BaseController {
     private TableColumn<Product, Integer> tableColumnProductInventoryLevel;
 
     @FXML
-    private TableColumn<Product, Double> tableColumnProductPrice;
+    private TableColumn<Product, String> tableColumnProductPrice;
 
     @FXML
     private TextField textFieldSearchProducts;
@@ -219,14 +219,14 @@ public class MainScreenController extends BaseController {
         tableColumnPartID.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getPartID()).asObject());
         tableColumnPartName.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
         tableColumnPartInventoryLevel.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getInStock()).asObject());
-        tableColumnPartPrice.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getPrice()).asObject());
+        tableColumnPartPrice.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPriceAsString()));
     }
 
     private void bindTableColumnsProducts() {
         tableColumnProductID.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getProductID()).asObject());
         tableColumnProductName.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
         tableColumnProductInventoryLevel.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getInStock()).asObject());
-        tableColumnProductPrice.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getPrice()).asObject());
+        tableColumnProductPrice.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPriceAsString()));
     }
 
     private void loadTableViewParts(ObservableList<Part> partList) {

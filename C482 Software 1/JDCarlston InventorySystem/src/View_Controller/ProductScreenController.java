@@ -111,7 +111,7 @@ public class ProductScreenController extends BaseController {
     private TableColumn<Part, Integer> tableColumnAssociatedPartInventoryLevel;
 
     @FXML
-    private TableColumn<Part, Double> tableColumnAssociatedPartPrice;
+    private TableColumn<Part, String> tableColumnAssociatedPartPrice;
 
     @FXML
     private Button btnDeletePart;
@@ -129,7 +129,7 @@ public class ProductScreenController extends BaseController {
     private TableColumn<Part, Integer> tableColumnAllPartInventoryLevel;
 
     @FXML
-    private TableColumn<Part, Double> tableColumnAllPartPrice;
+    private TableColumn<Part, String> tableColumnAllPartPrice;
 
     @FXML
     void clickAddPart(ActionEvent event) {
@@ -263,7 +263,7 @@ public class ProductScreenController extends BaseController {
         if (activeProduct.getProductID() != getNewProductID()) {
             textFieldProductName.setText(activeProduct.getName());
             textFieldProductInventory.setText(Integer.toString(activeProduct.getInStock()));
-            textFieldProductPrice.setText(Double.toString(activeProduct.getPrice()));
+            textFieldProductPrice.setText(activeProduct.getPriceAsString());
             textFieldProductMax.setText(Integer.toString(activeProduct.getMax()));
             textFieldProductMin.setText(Integer.toString(activeProduct.getMin()));
         }
@@ -306,26 +306,26 @@ public class ProductScreenController extends BaseController {
         String min = textFieldProductMin.getText();
         String max = textFieldProductMax.getText();
 
-        activeProduct.setProductID(Item.tryParseInt(id));
+        activeProduct.setProductID(id);
         activeProduct.setName(name);
-        activeProduct.setInStock(Item.tryParseInt(inventory));
-        activeProduct.setPrice(Item.tryParseDouble(price));
-        activeProduct.setMin(Item.tryParseInt(min));
-        activeProduct.setMax(Item.tryParseInt(max));
+        activeProduct.setInStock(inventory);
+        activeProduct.setPrice(price);
+        activeProduct.setMin(min);
+        activeProduct.setMax(max);
     }
 
     private void bindTableColumnsAllParts() {
         tableColumnAllPartID.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getPartID()).asObject());
         tableColumnAllPartName.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
         tableColumnAllPartInventoryLevel.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getInStock()).asObject());
-        tableColumnAllPartPrice.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getPrice()).asObject());
+        tableColumnAllPartPrice.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPriceAsString()));
     }
 
     private void bindTableColumnsAssociatedParts() {
         tableColumnAssociatedPartID.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getPartID()).asObject());
         tableColumnAssociatedPartName.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
         tableColumnAssociatedPartInventoryLevel.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getInStock()).asObject());
-        tableColumnAssociatedPartPrice.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getPrice()).asObject());
+        tableColumnAssociatedPartPrice.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPriceAsString()));
     }
 
     private void loadTableViewAllParts(ObservableList<Part> partList) {

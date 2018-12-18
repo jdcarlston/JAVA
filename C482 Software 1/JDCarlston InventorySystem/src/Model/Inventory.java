@@ -201,7 +201,7 @@ public class Inventory {
      */
     public static ObservableList<Part> lookupParts(String searchTerm) throws ValidationException {
         //if searchTerm is Int
-        Integer searchInt = Item.tryParseInt(searchTerm);
+        Integer searchInt = Part.tryParseInt(searchTerm);
         ObservableList<Part> foundParts = FXCollections.observableArrayList();
         boolean isAdded = false;
 
@@ -249,7 +249,7 @@ public class Inventory {
      */
     public static ObservableList<Product> lookupProducts(String searchTerm) throws ValidationException {
         //searchTerm is Int
-        Integer searchInt = Item.tryParseInt(searchTerm);
+        Integer searchInt = Product.tryParseInt(searchTerm);
         ObservableList<Product> foundProducts = FXCollections.observableArrayList();
         boolean isAdded = false;
 

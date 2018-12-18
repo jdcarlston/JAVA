@@ -131,7 +131,7 @@ public class PartScreenController extends BaseController {
         textFieldPartID.setText(Integer.toString(activePart.getPartID()));
         textFieldPartName.setText(activePart.getName());
         textFieldPartInventory.setText(Integer.toString(activePart.getInStock()));
-        textFieldPartPrice.setText(Double.toString(activePart.getPrice()));
+        textFieldPartPrice.setText(activePart.getPriceAsString());
         textFieldPartMax.setText(Integer.toString(activePart.getMax()));
         textFieldPartMin.setText(Integer.toString(activePart.getMin()));
 
